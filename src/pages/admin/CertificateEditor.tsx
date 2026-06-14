@@ -4,7 +4,7 @@ import { Certificate } from '../../types';
 import { Plus, Edit2, Trash2, X, Check, Search } from 'lucide-react';
 
 export default function CertificateEditor() {
-  const { data: certificates, fetchAll, create, update, remove, loading } = useFirestore<Certificate>('certificates');
+  const { data: certificates, fetchAll, create, update, remove, loading, error } = useFirestore<Certificate>('certificates');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,14 +63,22 @@ export default function CertificateEditor() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to completely delete this certificate record?')) {
-      await remove(id);
-      fetchAll();
+      try {
+        await remove(id);
+        fetchAll();
+      } catch (e) {
+        alert('Error deleting certificate');
+      }
     }
   };
 
   const toggleStatus = async (certificate: Certificate) => {
-    await update(certificate.id, { isActive: !certificate.isActive });
-    fetchAll();
+    try {
+      await update(certificate.id, { isActive: !certificate.isActive });
+      fetchAll();
+    } catch (e) {
+      alert('Error updating status');
+    }
   };
 
   const filteredCerts = certificates.filter(c => 
@@ -166,51 +174,61 @@ export default function CertificateEditor() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="p-3 text-sm font-semibold text-slate-600">Student Name</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Roll No</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Certificate ID</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Status</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCerts.map(cert => (
-              <tr key={cert.id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="p-3 text-sm font-medium text-slate-900">{cert.studentName}</td>
-                <td className="p-3 text-sm text-slate-500">{cert.rollNumber}</td>
-                <td className="p-3 text-sm font-mono text-slate-500">{cert.certificateId}</td>
-                <td className="p-3 text-sm">
-                  {cert.isActive ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                      Active
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                      Revoked
-                    </span>
-                  )}
-                </td>
-                <td className="p-3 text-sm">
-                  <div className="flex space-x-3 items-center">
-                    <button onClick={() => toggleStatus(cert)} className="text-slate-500 hover:text-slate-700" title="Toggle Status">
-                      <Check className="w-4 h-4"/>
-                    </button>
-                    <button onClick={() => handleEdit(cert)} className="text-blue-600 hover:text-blue-800"><Edit2 className="w-4 h-4"/></button>
-                    <button onClick={() => handleDelete(cert.id)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4"/></button>
-                  </div>
-                </td>
+      {error && (
+        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="py-12 text-center text-slate-500">Loading certificates...</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="p-3 text-sm font-semibold text-slate-600">Student Name</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Roll No</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Certificate ID</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Status</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Actions</th>
               </tr>
-            ))}
-            {filteredCerts.length === 0 && !loading && (
-              <tr><td colSpan={5} className="p-6 text-center text-slate-500">No records found.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filteredCerts.map(cert => (
+                <tr key={cert.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="p-3 text-sm font-medium text-slate-900">{cert.studentName}</td>
+                  <td className="p-3 text-sm text-slate-500">{cert.rollNumber}</td>
+                  <td className="p-3 text-sm font-mono text-slate-500">{cert.certificateId}</td>
+                  <td className="p-3 text-sm">
+                    {cert.isActive ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        Active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                        Revoked
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-3 text-sm">
+                    <div className="flex space-x-3 items-center">
+                      <button onClick={() => toggleStatus(cert)} className="text-slate-500 hover:text-slate-700" title="Toggle Status">
+                        <Check className="w-4 h-4"/>
+                      </button>
+                      <button onClick={() => handleEdit(cert)} className="text-blue-600 hover:text-blue-800"><Edit2 className="w-4 h-4"/></button>
+                      <button onClick={() => handleDelete(cert.id)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4"/></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filteredCerts.length === 0 && (
+                <tr><td colSpan={5} className="p-6 text-center text-slate-500">No records found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

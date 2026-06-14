@@ -30,7 +30,9 @@ export function useFirestore<T>(collectionName: string) {
       setData(items);
       setError(null);
     } catch (err) {
-      handleFirestoreError(err, OperationType.LIST, collectionName);
+      setError(err instanceof Error ? err.message : String(err));
+      // Stop throwing from handleFirestoreError so we don't crash
+      // handleFirestoreError(err, OperationType.LIST, collectionName);
     } finally {
       setLoading(false);
     }
@@ -45,7 +47,7 @@ export function useFirestore<T>(collectionName: string) {
       }
       return null;
     } catch (err) {
-      handleFirestoreError(err, OperationType.GET, `${collectionName}/${id}`);
+      setError(err instanceof Error ? err.message : String(err));
       return null;
     }
   }, [collectionName]);
@@ -62,7 +64,7 @@ export function useFirestore<T>(collectionName: string) {
       }
       return id;
     } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, collectionName);
+      setError(err instanceof Error ? err.message : String(err));
       throw err;
     }
   }, [collectionName]);
@@ -72,7 +74,7 @@ export function useFirestore<T>(collectionName: string) {
       const docRef = doc(db, collectionName, id);
       await updateDoc(docRef, item as any);
     } catch (err) {
-      handleFirestoreError(err, OperationType.UPDATE, `${collectionName}/${id}`);
+      setError(err instanceof Error ? err.message : String(err));
       throw err;
     }
   }, [collectionName]);
@@ -82,7 +84,7 @@ export function useFirestore<T>(collectionName: string) {
       const docRef = doc(db, collectionName, id);
       await deleteDoc(docRef);
     } catch (err) {
-      handleFirestoreError(err, OperationType.DELETE, `${collectionName}/${id}`);
+      setError(err instanceof Error ? err.message : String(err));
       throw err;
     }
   }, [collectionName]);

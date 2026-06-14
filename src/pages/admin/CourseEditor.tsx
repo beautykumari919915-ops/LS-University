@@ -4,7 +4,7 @@ import { Course } from '../../types';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
 
 export default function CourseEditor() {
-  const { data: courses, fetchAll, create, update, remove, loading } = useFirestore<Course>('courses');
+  const { data: courses, fetchAll, create, update, remove, loading, error } = useFirestore<Course>('courses');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState<Partial<Course>>({
@@ -45,8 +45,12 @@ export default function CourseEditor() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this course?')) {
-      await remove(id);
-      fetchAll();
+      try {
+        await remove(id);
+        fetchAll();
+      } catch (e) {
+        alert('Error deleting course');
+      }
     }
   };
 
@@ -117,36 +121,46 @@ export default function CourseEditor() {
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="p-3 text-sm font-semibold text-slate-600">Name</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Category</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Duration</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {courses.map(course => (
-              <tr key={course.id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="p-3 text-sm font-medium text-slate-900">{course.name}</td>
-                <td className="p-3 text-sm text-slate-500 capitalize">{course.category}</td>
-                <td className="p-3 text-sm text-slate-500">{course.duration}</td>
-                <td className="p-3 text-sm">
-                  <div className="flex space-x-3">
-                    <button onClick={() => handleEdit(course)} className="text-blue-600 hover:text-blue-800"><Edit2 className="w-4 h-4"/></button>
-                    <button onClick={() => handleDelete(course.id)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4"/></button>
-                  </div>
-                </td>
+      {error && (
+        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="py-12 text-center text-slate-500">Loading courses...</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="p-3 text-sm font-semibold text-slate-600">Name</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Category</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Duration</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Actions</th>
               </tr>
-            ))}
-            {courses.length === 0 && !loading && (
-              <tr><td colSpan={4} className="p-6 text-center text-slate-500">No courses found. Add one.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {courses.map(course => (
+                <tr key={course.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="p-3 text-sm font-medium text-slate-900">{course.name}</td>
+                  <td className="p-3 text-sm text-slate-500 capitalize">{course.category}</td>
+                  <td className="p-3 text-sm text-slate-500">{course.duration}</td>
+                  <td className="p-3 text-sm">
+                    <div className="flex space-x-3">
+                      <button onClick={() => handleEdit(course)} className="text-blue-600 hover:text-blue-800"><Edit2 className="w-4 h-4"/></button>
+                      <button onClick={() => handleDelete(course.id)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4"/></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {courses.length === 0 && (
+                <tr><td colSpan={4} className="p-6 text-center text-slate-500">No courses found. Add one.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { NewsEvent } from '../../types';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
 
 export default function EventEditor() {
-  const { data: events, fetchAll, create, update, remove, loading } = useFirestore<NewsEvent>('newsEvents');
+  const { data: events, fetchAll, create, update, remove, loading, error } = useFirestore<NewsEvent>('newsEvents');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState<Partial<NewsEvent>>({ title: '', date: '', content: '' });
@@ -41,8 +41,12 @@ export default function EventEditor() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this event?')) {
-      await remove(id);
-      fetchAll();
+      try {
+        await remove(id);
+        fetchAll();
+      } catch (e) {
+        alert('Error deleting event');
+      }
     }
   };
 
@@ -84,34 +88,44 @@ export default function EventEditor() {
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="p-3 text-sm font-semibold text-slate-600">Title</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Date</th>
-              <th className="p-3 text-sm font-semibold text-slate-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {events.map(event => (
-              <tr key={event.id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="p-3 text-sm font-medium text-slate-900">{event.title}</td>
-                <td className="p-3 text-sm text-slate-500">{event.date}</td>
-                <td className="p-3 text-sm">
-                  <div className="flex space-x-3">
-                    <button onClick={() => handleEdit(event)} className="text-blue-600 hover:text-blue-800"><Edit2 className="w-4 h-4"/></button>
-                    <button onClick={() => handleDelete(event.id)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4"/></button>
-                  </div>
-                </td>
+      {error && (
+        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="py-12 text-center text-slate-500">Loading events...</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="p-3 text-sm font-semibold text-slate-600">Title</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Date</th>
+                <th className="p-3 text-sm font-semibold text-slate-600">Actions</th>
               </tr>
-            ))}
-            {events.length === 0 && !loading && (
-              <tr><td colSpan={3} className="p-6 text-center text-slate-500">No events found. Add one.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {events.map(event => (
+                <tr key={event.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="p-3 text-sm font-medium text-slate-900">{event.title}</td>
+                  <td className="p-3 text-sm text-slate-500">{event.date}</td>
+                  <td className="p-3 text-sm">
+                    <div className="flex space-x-3">
+                      <button onClick={() => handleEdit(event)} className="text-blue-600 hover:text-blue-800"><Edit2 className="w-4 h-4"/></button>
+                      <button onClick={() => handleDelete(event.id)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4"/></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {events.length === 0 && (
+                <tr><td colSpan={3} className="p-6 text-center text-slate-500">No events found. Add one.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

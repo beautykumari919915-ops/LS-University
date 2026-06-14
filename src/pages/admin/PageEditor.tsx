@@ -13,7 +13,7 @@ const defaultSchema: Record<string, string[]> = {
 
 export default function PageEditor() {
   const [selectedPage, setSelectedPage] = useState('home');
-  const { fetchOne, update, create, loading } = useFirestore<PageContent>('pageContents');
+  const { fetchOne, update, create, loading, error } = useFirestore<PageContent>('pageContents');
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -76,7 +76,16 @@ export default function PageEditor() {
         </select>
       </div>
 
-      <div className="space-y-6">
+      {error && (
+        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="py-12 text-center text-slate-500">Loading content...</div>
+      ) : (
+        <div className="space-y-6">
         {keysToEdit.map((key) => (
           <div key={key}>
             <label className="block text-sm font-medium text-slate-700 mb-1 capitalize">
@@ -113,6 +122,7 @@ export default function PageEditor() {
           {message && <span className="ml-4 text-sm text-green-600 font-medium">{message}</span>}
         </div>
       </div>
+      )}
     </div>
   );
 }
