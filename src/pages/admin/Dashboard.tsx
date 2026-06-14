@@ -122,22 +122,6 @@ export default function AdminDashboard() {
         
         <div className="p-4 border-t border-slate-800 space-y-2">
           <button 
-            onClick={async () => {
-              if (confirm('This will seed the database with test data. Proceed?')) {
-                try {
-                  const { default: seedDatabase } = await import('../../lib/seed');
-                  await seedDatabase();
-                  alert('Database seeded successfully! Please refresh the page.');
-                } catch (e: any) {
-                  alert('Failed to seed database: ' + e.message);
-                }
-              }
-            }}
-            className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-amber-500 border border-amber-500 hover:bg-amber-500 hover:text-slate-900 rounded-md transition-colors"
-          >
-             Seed Demo Data
-          </button>
-          <button 
             onClick={signOut}
             className="w-full flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md"
           >

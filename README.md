@@ -35,21 +35,6 @@ A full-stack, comprehensive educational institution portal built with React, Vit
    npm run dev
    ```
 
-4. **Seed the Database (CRITICAL)**:
-
-   **Method A: Authenticated Admin Panel (Recommended)**
-   - Start the project and navigate to `/admin`.
-   - Sign up or sign in using Firebase Auth.
-   - Click the "Seed Demo Data" button in the Admin Sidebar to populate all demo content (12 Courses, 5 Certificates, 8 Placements, etc).
-
-   **Method B: Backend Node Script**
-   - Download your Service Account Key from Firebase and set it:
-     `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/key.json"`
-   - Run `npm run seed` to perform an automated backend data push.
-
-   **Method C: Express API Route**
-   - You can hit the backend trigger (for CI/CD workflows) at:
-     `GET /api/seed?secret=my_secure_seed_token`
 
 ## Deployment
 

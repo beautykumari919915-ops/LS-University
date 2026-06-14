@@ -166,7 +166,7 @@ export default function Home() {
                 </div>
               </motion.div>
             )) : (
-              <div className="col-span-3 text-center text-slate-500 py-12">No courses available yet. Seed data in admin panel.</div>
+              <div className="col-span-3 text-center text-slate-500 py-12">No courses available yet.</div>
             )}
           </div>
           <div className="text-center mt-12">
