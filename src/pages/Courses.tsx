@@ -38,19 +38,20 @@ export default function Courses() {
 
         {/* Filters & Search */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
-          <div className="flex bg-white p-1 rounded-lg shadow-sm border border-slate-200">
-            {['all', 'technical', 'management', 'general'].map((cat) => (
+          <div className="flex bg-white p-1 rounded-lg shadow-sm border border-slate-200 overflow-x-auto w-full md:w-auto pb-2 md:pb-1 hide-scrollbar">
+            {['all', ...Array.from(new Set(courses.map(c => c.category)))].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2 rounded-md text-sm font-medium capitalize transition-colors ${
-                  activeCategory === cat ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                className={`px-5 py-2 rounded-md text-sm font-medium uppercase tracking-wider transition-colors whitespace-nowrap ${
+                  activeCategory === cat ? 'bg-ls-blue text-white' : 'text-slate-600 hover:bg-slate-100'
                 }`}
               >
                 {cat}
               </button>
             ))}
           </div>
+
           
           <div className="relative w-full md:w-72">
             <input 

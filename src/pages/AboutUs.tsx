@@ -1,46 +1,31 @@
-import { useEffect, useState } from 'react';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { TeamMember, PageContent } from '../types';
+import { useEffect } from 'react';
+import { TeamMember } from '../types';
 import { motion } from 'motion/react';
 import { Award, Target, BookOpen } from 'lucide-react';
+import { useFirestore } from '../hooks/useFirestore';
+import { usePageContent } from '../hooks/usePageContent';
+import Markdown from 'react-markdown';
 
 export default function AboutUs() {
-  const [team, setTeam] = useState<TeamMember[]>([]);
-  const [pageData, setPageData] = useState<PageContent | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: team, fetchAll: fetchTeam, loading: teamLoading } = useFirestore<TeamMember>('faculty'); // Using faculty as team members
+  const { content, loading: pageLoading } = usePageContent('about');
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const teamSnap = await getDocs(collection(db, 'teamMembers'));
-        setTeam(teamSnap.docs.map(d => ({ id: d.id, ...d.data() })) as TeamMember[]);
-
-        const pageDoc = await getDoc(doc(db, 'pageContents', 'about'));
-        if (pageDoc.exists()) {
-          setPageData(pageDoc.data() as PageContent);
-        }
-      } catch (e) {
-        console.error("Error fetching about data:", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+    fetchTeam();
+  }, [fetchTeam]);
 
   const defaultText = "LS University has a rich heritage of academic excellence... Add your dynamic content in the admin panel.";
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Hero */}
+      {/*...rest of UI...*/}
       <section className="bg-slate-900 text-white py-24 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
         <div className="relative z-10 max-w-4xl mx-auto">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-6xl font-black mb-6"
           >
-            About LS University
+            {content.heading || 'About LS University'}
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
@@ -56,8 +41,8 @@ export default function AboutUs() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl font-bold text-slate-900 mb-6">Our Legacy</h2>
-            <div className="prose prose-lg text-slate-600">
-              <p>{pageData ? JSON.parse(pageData.content).body || defaultText : defaultText}</p>
+            <div className="prose prose-slate prose-lg max-w-none">
+              <Markdown>{content.body || defaultText}</Markdown>
             </div>
             
             <div className="mt-8 space-y-6">
@@ -101,20 +86,20 @@ export default function AboutUs() {
             <p className="mt-4 text-slate-600 max-w-2xl mx-auto">Meet the visionary minds guiding our institution towards global excellence.</p>
           </div>
 
-          {loading ? (
+          {teamLoading ? (
              <div className="flex justify-center"><div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {team.map((member, i) => (
+              {team.slice(0, 3).map((member, i) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   key={member.id} 
-                  className="bg-slate-50 rounded-2xl p-8 border border-slate-200 shadow-sm text-center hover:shadow-md transition-shadow"
+                  className="bg-slate-50 rounded-2xl p-8 border border-slate-200 shadow-sm text-center hover:shadow-md transition-shadow flex flex-col items-center"
                 >
-                  <div className="w-24 h-24 bg-slate-200 mx-auto rounded-full mb-6 overflow-hidden border-4 border-white shadow-sm flex items-center justify-center text-slate-400 text-3xl font-bold">
+                  <div className="w-24 h-24 bg-slate-200 rounded-full mb-6 overflow-hidden border-4 border-white shadow-sm flex items-center justify-center text-slate-400 text-3xl font-bold">
                     {member.photoUrl ? (
                       <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover" />
                     ) : (
@@ -123,8 +108,8 @@ export default function AboutUs() {
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-1">{member.name}</h3>
                   <p className="text-sm font-semibold text-amber-600 uppercase tracking-wide mb-4">{member.designation}</p>
-                  {member.message && (
-                    <p className="text-slate-600 text-sm italic">"{member.message}"</p>
+                  {(member as any).message && (
+                    <p className="text-slate-600 text-sm italic">"{(member as any).message}"</p>
                   )}
                 </motion.div>
               ))}
@@ -157,3 +142,4 @@ export default function AboutUs() {
     </div>
   );
 }
+

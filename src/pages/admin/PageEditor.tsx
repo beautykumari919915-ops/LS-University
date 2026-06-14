@@ -4,11 +4,42 @@ import { PageContent } from '../../types';
 
 const defaultSchema: Record<string, string[]> = {
   home: ['heroHeading', 'heroSubheading', 'heroCta', 'stats1Value', 'stats1Label', 'stats2Value', 'stats2Label', 'stats3Value', 'stats3Label', 'stats4Value', 'stats4Label', 'aboutHeading', 'aboutText', 'featuredCoursesHeading', 'newsHeading'],
+  homepageSliders: ['slide1Image', 'slide1Title', 'slide2Image', 'slide2Title', 'slide3Image', 'slide3Title'],
+  announcement: ['isEnabled', 'messageText', 'linkUrl'],
+  seo: ['globalTitle', 'globalDescription', 'keywords', 'ogImage'],
   about: ['heading', 'body'],
+  vision: ['heading', 'missionBody', 'visionBody', 'valuesBody'],
+  chancellorMessage: ['name', 'heading', 'body', 'photoUrl'],
+  viceChancellorMessage: ['name', 'heading', 'body', 'photoUrl'],
+  registrarMessage: ['name', 'heading', 'body', 'photoUrl'],
   admissions: ['heading', 'body'],
+  feeStructure: ['heading', 'body'],
   placements: ['heading', 'body'],
+  training: ['heading', 'body'],
+  research: ['heading', 'body'],
+  innovation: ['heading', 'body'],
+  incubation: ['heading', 'body'],
+  studentLife: ['heading', 'body'],
+  facilities: ['heading', 'body'],
+  hostel: ['heading', 'body'],
+  library: ['heading', 'body'],
+  sports: ['heading', 'body'],
+  gallery: ['heading', 'body'],
+  videoGallery: ['heading', 'body'],
+  alumniPage: ['heading', 'body'],
+  alumni: ['heading', 'body'],
+  examination: ['heading', 'body'],
+  academicCalendar: ['heading', 'body'],
+  studentCorner: ['heading', 'body'],
+  iqac: ['heading', 'body'],
+  collaborations: ['heading', 'body'],
+  'anti-ragging': ['heading', 'body'],
+  grievance: ['heading', 'body'],
+  rti: ['heading', 'body'],
+  icc: ['heading', 'body'],
+  approvals: ['heading', 'body'],
   'campus-life': ['heading', 'body'],
-  contact: ['heading', 'body']
+  contact: ['heading', 'body', 'address', 'phone', 'email', 'mapEmbedUrl']
 };
 
 export default function PageEditor() {

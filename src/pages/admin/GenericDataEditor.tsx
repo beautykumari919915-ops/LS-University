@@ -71,84 +71,89 @@ export default function GenericDataEditor({ collectionName, title, fields, displ
 
   if (isAdding || editingId) {
     return (
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6 border-b pb-4">
-          <h2 className="text-2xl font-bold bg-white text-slate-900">{editingId ? `Edit ${title}` : `Add New ${title}`}</h2>
-          <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="p-2 hover:bg-slate-100 rounded-full">
+      <div className="p-8">
+        <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
+          <h2 className="text-3xl font-serif text-ls-blue bg-white">{editingId ? `Edit ${title}` : `Add New ${title}`}</h2>
+          <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
             <X className="w-5 h-5 text-slate-500" />
           </button>
         </div>
         
-        <div className="space-y-4 max-w-2xl bg-white">
+        <div className="space-y-6 max-w-3xl bg-white">
           {fields.map((field) => (
             <div key={field.key}>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{field.label}</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">{field.label}</label>
               {field.type === 'textarea' ? (
                  <textarea
                   value={formData[field.key] || ''}
                   onChange={e => setFormData({...formData, [field.key]: e.target.value})}
-                  className="w-full px-3 py-2 border rounded resize-y min-h-[100px]"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl resize-y min-h-[150px] focus:ring-2 focus:ring-ls-blue focus:border-ls-blue transition-shadow outline-none"
                   required={field.required}
+                  placeholder={`Enter ${field.label}...`}
                  />
               ) : (
                 <input 
                   type={field.type || 'text'} 
                   value={formData[field.key] || ''} 
                   onChange={e => setFormData({...formData, [field.key]: e.target.value})} 
-                  className="w-full px-3 py-2 border rounded" 
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-ls-blue focus:border-ls-blue transition-shadow outline-none" 
                   required={field.required}
+                  placeholder={`Enter ${field.label}...`}
                 />
               )}
             </div>
           ))}
           
-          <button onClick={handleSave} className="mt-4 px-6 py-2 bg-amber-500 text-slate-900 rounded font-medium shadow-sm hover:bg-amber-400">Save Record</button>
+          <button onClick={handleSave} className="mt-8 px-8 py-3 bg-ls-gold text-ls-blue rounded-full font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">Save Record</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">{title} Records</h2>
-        <button onClick={handleCreateNew} className="flex items-center px-4 py-2 bg-slate-900 text-white rounded text-sm font-medium hover:bg-slate-800 shadow-sm">
-          <Plus className="w-4 h-4 mr-2" /> Add New
+    <div className="p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-3xl font-serif text-ls-blue">{title} Records</h2>
+        <button onClick={handleCreateNew} className="flex items-center px-6 py-2.5 bg-ls-blue text-white rounded-full text-sm font-bold shadow-md hover:bg-ls-blue-light hover:shadow-lg transition-all hover:-translate-y-0.5">
+          <Plus className="w-4 h-4 mr-2" /> Add New Record
         </button>
       </div>
 
       {error && (
-        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">
+        <div className="mb-6 p-4 text-red-700 bg-red-50 border border-red-200 rounded-xl">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="py-12 text-center text-slate-500">Loading records...</div>
+        <div className="py-20 text-center text-slate-500 flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-ls-gold mb-4"></div>
+          Loading records...
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data.map(item => (
-            <div key={item.id} className="p-5 border border-slate-200 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow relative group">
-              <h3 className="font-bold text-lg text-slate-900 mb-1 truncate">{displayKey ? item[displayKey] : 'Record'}</h3>
-              {subtitleKey && <p className="text-sm text-slate-600 mb-4 truncate">{item[subtitleKey]}</p>}
+            <div key={item.id} className="p-6 border border-slate-100 rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all relative group flex flex-col">
+              <h3 className="font-bold text-xl text-ls-blue mb-1 truncate font-serif">{displayKey ? item[displayKey] : 'Record'}</h3>
+              {subtitleKey && <p className="text-sm text-slate-500 mb-6 truncate font-medium">{item[subtitleKey]}</p>}
               
-              <div className="flex flex-col text-xs text-slate-500 gap-1 pb-4">
+              <div className="flex flex-col text-sm text-slate-600 gap-2 flex-grow">
                 {fields.slice(0, 3).map(f => (
                   <div key={f.key} className="truncate">
-                    <span className="font-medium">{f.label}:</span> {item[f.key] ? String(item[f.key]).substring(0, 50) : ''}
+                    <strong className="text-slate-800 font-semibold">{f.label}:</strong> {item[f.key] ? String(item[f.key]).substring(0, 50) : ''}
                   </div>
                 ))}
               </div>
 
-              <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => handleEdit(item)} className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 shadow-sm"><Edit2 className="w-4 h-4"/></button>
-                <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-600 rounded-full hover:bg-red-100 shadow-sm"><Trash2 className="w-4 h-4"/></button>
+              <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0">
+                <button onClick={() => handleEdit(item)} className="p-2 bg-white text-ls-blue border border-slate-200 rounded-full hover:bg-slate-50 shadow-md transition-colors"><Edit2 className="w-4 h-4"/></button>
+                <button onClick={() => handleDelete(item.id)} className="p-2 bg-white text-red-600 border border-slate-200 rounded-full hover:bg-red-50 shadow-md transition-colors"><Trash2 className="w-4 h-4"/></button>
               </div>
             </div>
           ))}
           {data.length === 0 && (
-            <div className="col-span-full py-12 text-center text-slate-500 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-              No records found. Click "Add New" to create one.
+            <div className="col-span-full py-16 text-center text-slate-500 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+              No records found. Click "Add New Record" to create one.
             </div>
           )}
         </div>

@@ -8,13 +8,10 @@ import {
   addDoc, 
   updateDoc, 
   deleteDoc, 
-  query, 
-  where,
-  orderBy
+  query
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { handleFirestoreError } from '../lib/errorUtils';
-import { OperationType } from '../types';
+import { DEMO_CONTENT } from '../lib/demoData';
 
 export function useFirestore<T>(collectionName: string) {
   const [data, setData] = useState<T[]>([]);
@@ -27,12 +24,24 @@ export function useFirestore<T>(collectionName: string) {
       const q = query(collection(db, collectionName));
       const querySnapshot = await getDocs(q);
       const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
-      setData(items);
+      
+      // Fallback for demo data if collection is empty
+      if (items.length === 0 && (DEMO_CONTENT.collections as any)[collectionName]) {
+        setData((DEMO_CONTENT.collections as any)[collectionName]);
+      } else {
+        setData(items);
+      }
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message && err.message.includes('Missing or insufficient permissions')) {
+          // If firestore read blocked, gracefully substitute with demo data too
+          if ((DEMO_CONTENT.collections as any)[collectionName]) {
+             setData((DEMO_CONTENT.collections as any)[collectionName]);
+             setError(null);
+             return;
+          }
+      }
       setError(err instanceof Error ? err.message : String(err));
-      // Stop throwing from handleFirestoreError so we don't crash
-      // handleFirestoreError(err, OperationType.LIST, collectionName);
     } finally {
       setLoading(false);
     }
@@ -45,12 +54,22 @@ export function useFirestore<T>(collectionName: string) {
       if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as T;
       }
+      // Demo Data Fallback for missing documents
+      if (collectionName === 'pageContents' && (DEMO_CONTENT.pages as any)[id]) {
+        return { id, content: (DEMO_CONTENT.pages as any)[id] } as T;
+      }
       return null;
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message && err.message.includes('Missing or insufficient permissions')) {
+        if (collectionName === 'pageContents' && (DEMO_CONTENT.pages as any)[id]) {
+          return { id, content: (DEMO_CONTENT.pages as any)[id] } as T;
+        }
+      }
       setError(err instanceof Error ? err.message : String(err));
       return null;
     }
   }, [collectionName]);
+
 
   const create = useCallback(async (item: Omit<T, 'id'>, customId?: string) => {
     try {
@@ -72,7 +91,7 @@ export function useFirestore<T>(collectionName: string) {
   const update = useCallback(async (id: string, item: Partial<T>) => {
     try {
       const docRef = doc(db, collectionName, id);
-      await updateDoc(docRef, item as any);
+      await setDoc(docRef, item, { merge: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       throw err;

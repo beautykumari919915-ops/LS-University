@@ -1,29 +1,15 @@
-import { useEffect, useState } from 'react';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { useEffect } from 'react';
 import { Placement } from '../types';
 import { Briefcase, Building, TrendingUp } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useFirestore } from '../hooks/useFirestore';
 
 export default function Placements() {
-  const [placements, setPlacements] = useState<Placement[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: placements, fetchAll, loading } = useFirestore<Placement>('placements');
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const q = query(collection(db, 'placements'), orderBy('year', 'desc'));
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Placement[];
-        setPlacements(data);
-      } catch (error) {
-        console.error("Error fetching placements:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+    fetchAll();
+  }, [fetchAll]);
 
   return (
     <div className="bg-slate-50 min-h-screen">
