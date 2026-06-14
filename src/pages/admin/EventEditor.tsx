@@ -9,7 +9,13 @@ export default function EventEditor() {
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState<Partial<NewsEvent>>({ title: '', date: '', content: '' });
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    try {
+      fetchAll();
+    } catch (e) {
+      console.error('Error fetching events:', e);
+    }
+  }, [fetchAll]);
 
   const handleEdit = (event: NewsEvent) => {
     setEditingId(event.id);
@@ -35,6 +41,7 @@ export default function EventEditor() {
       setEditingId(null);
       fetchAll();
     } catch (e) {
+      console.error('Error saving event:', e);
       alert('Error saving event');
     }
   };
@@ -45,6 +52,7 @@ export default function EventEditor() {
         await remove(id);
         fetchAll();
       } catch (e) {
+        console.error('Error deleting event:', e);
         alert('Error deleting event');
       }
     }

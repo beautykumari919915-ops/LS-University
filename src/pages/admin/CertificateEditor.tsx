@@ -21,7 +21,11 @@ export default function CertificateEditor() {
   });
 
   useEffect(() => {
-    fetchAll();
+    try {
+      fetchAll();
+    } catch (e) {
+      console.error('Error fetching certificates:', e);
+    }
   }, [fetchAll]);
 
   const handleEdit = (certificate: Certificate) => {
@@ -57,6 +61,7 @@ export default function CertificateEditor() {
       setEditingId(null);
       fetchAll();
     } catch (e) {
+      console.error('Error saving certificate:', e);
       alert('Error saving certificate');
     }
   };
@@ -67,6 +72,7 @@ export default function CertificateEditor() {
         await remove(id);
         fetchAll();
       } catch (e) {
+        console.error('Error deleting certificate:', e);
         alert('Error deleting certificate');
       }
     }
@@ -77,14 +83,15 @@ export default function CertificateEditor() {
       await update(certificate.id, { isActive: !certificate.isActive });
       fetchAll();
     } catch (e) {
+      console.error('Error updating status:', e);
       alert('Error updating status');
     }
   };
 
   const filteredCerts = certificates.filter(c => 
-    c.studentName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    c.rollNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.certificateId.toLowerCase().includes(searchQuery.toLowerCase())
+    (c.studentName || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (c.rollNumber || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.certificateId || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (isAdding || editingId) {

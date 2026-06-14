@@ -8,6 +8,8 @@ import EventEditor from './EventEditor';
 import CertificateEditor from './CertificateEditor';
 import GenericDataEditor from './GenericDataEditor';
 
+import { ErrorBoundary } from '../../components/ErrorBoundary';
+
 export default function AdminDashboard() {
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('pages');
@@ -133,7 +135,9 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-4 md:p-8">
         <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[600px]">
-          {renderTab()}
+          <ErrorBoundary>
+            {renderTab()}
+          </ErrorBoundary>
         </div>
       </div>
     </div>

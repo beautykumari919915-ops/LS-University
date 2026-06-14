@@ -12,7 +12,11 @@ export default function CourseEditor() {
   });
 
   useEffect(() => {
-    fetchAll();
+    try {
+      fetchAll();
+    } catch (e) {
+      console.error('Error fetching courses:', e);
+    }
   }, [fetchAll]);
 
   const handleEdit = (course: Course) => {
@@ -39,6 +43,7 @@ export default function CourseEditor() {
       setEditingId(null);
       fetchAll();
     } catch (e) {
+      console.error('Error saving course:', e);
       alert('Error saving course');
     }
   };
@@ -49,6 +54,7 @@ export default function CourseEditor() {
         await remove(id);
         fetchAll();
       } catch (e) {
+        console.error('Error deleting course:', e);
         alert('Error deleting course');
       }
     }

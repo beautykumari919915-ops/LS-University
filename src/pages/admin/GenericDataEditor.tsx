@@ -22,7 +22,11 @@ export default function GenericDataEditor({ collectionName, title, fields, displ
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
-    fetchAll();
+    try {
+      fetchAll();
+    } catch (e) {
+      console.error('Error fetching records:', e);
+    }
   }, [fetchAll]);
 
   const handleEdit = (item: any) => {
@@ -48,6 +52,7 @@ export default function GenericDataEditor({ collectionName, title, fields, displ
       setEditingId(null);
       fetchAll();
     } catch (e) {
+      console.error('Error saving record:', e);
       alert('Error saving record');
     }
   };
@@ -58,6 +63,7 @@ export default function GenericDataEditor({ collectionName, title, fields, displ
         await remove(id);
         fetchAll();
       } catch (e) {
+        console.error('Error deleting record:', e);
         alert('Error deleting record');
       }
     }
@@ -129,7 +135,7 @@ export default function GenericDataEditor({ collectionName, title, fields, displ
               <div className="flex flex-col text-xs text-slate-500 gap-1 pb-4">
                 {fields.slice(0, 3).map(f => (
                   <div key={f.key} className="truncate">
-                    <span className="font-medium">{f.label}:</span> {item[f.key]?.toString().substring(0, 50)}
+                    <span className="font-medium">{f.label}:</span> {item[f.key] ? String(item[f.key]).substring(0, 50) : ''}
                   </div>
                 ))}
               </div>

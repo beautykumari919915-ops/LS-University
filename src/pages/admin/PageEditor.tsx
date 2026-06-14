@@ -20,15 +20,20 @@ export default function PageEditor() {
 
   useEffect(() => {
     async function loadData() {
-      const data = await fetchOne(selectedPage);
-      if (data) {
-        try {
-          const parsed = JSON.parse(data.content);
-          setFormData(parsed);
-        } catch(e) {
+      try {
+        const data = await fetchOne(selectedPage);
+        if (data && data.content) {
+          try {
+            const parsed = JSON.parse(data.content);
+            setFormData(parsed && typeof parsed === 'object' ? parsed : {});
+          } catch(e) {
+            setFormData({});
+          }
+        } else {
           setFormData({});
         }
-      } else {
+      } catch (e) {
+        console.error('Error fetching page content:', e);
         setFormData({});
       }
     }
@@ -53,6 +58,7 @@ export default function PageEditor() {
       setMessage('Successfully saved!');
       setTimeout(() => setMessage(''), 3000);
     } catch (e: any) {
+      console.error('Error saving page metadata:', e);
       setMessage('Error saving: ' + e.message);
     } finally {
       setSaving(false);
