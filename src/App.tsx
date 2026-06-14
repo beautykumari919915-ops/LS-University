@@ -67,7 +67,7 @@ export default function App() {
             <Route path="verify-certificate" element={<CertificateVerification />} />
           </Route>
           
-          <Route path="/admin">
+          <Route path="/admin" element={<Outlet />}>
             <Route index element={<AdminLogin />} />
             <Route path="dashboard" element={<AdminDashboard />} />
           </Route>
