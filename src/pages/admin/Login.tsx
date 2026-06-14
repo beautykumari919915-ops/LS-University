@@ -24,11 +24,30 @@ export default function AdminLogin() {
     setLoading(true);
     
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      console.log('Firebase Login Request Attempt');
+      console.log('- Firebase project ID:', auth.app.options.projectId);
+      console.log('- Auth provider used: Email/Password (signInWithEmailAndPassword)');
+      
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      console.log('- Login request result: SUCCESS');
+      console.log('- User:', userCredential.user.uid);
+      
       navigate('/admin/dashboard');
     } catch (err: any) {
-      console.error('Firebase Auth Error:', err);
-      setError(err.message || 'Failed to login');
+      console.error('Firebase Login Request Attempt Failed');
+      console.error('- Firebase project ID:', auth.app.options.projectId);
+      console.error('- Auth provider used: Email/Password (signInWithEmailAndPassword)');
+      console.error('- Login request result: FAILED');
+      console.error('- Exact Firebase error code:', err.code);
+      console.error('- Exact Firebase error message:', err.message);
+      
+      let displayMessage = err.message || 'Failed to login';
+      if (err.code === 'auth/operation-not-allowed') {
+        displayMessage = 'Email/Password authentication is not enabled. Please enable it in the Firebase Console -> Authentication -> Sign-in method.';
+      }
+      
+      setError(displayMessage);
     } finally {
       setLoading(false);
     }
