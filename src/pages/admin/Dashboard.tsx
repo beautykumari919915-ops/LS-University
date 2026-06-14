@@ -10,7 +10,15 @@ import GenericDataEditor from './GenericDataEditor';
 
 import { ErrorBoundary } from '../../components/ErrorBoundary';
 
-export default function AdminDashboard() {
+export default function AdminDashboardBoundary() {
+  return (
+    <ErrorBoundary>
+      <AdminDashboard />
+    </ErrorBoundary>
+  );
+}
+
+function AdminDashboard() {
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('pages');
 

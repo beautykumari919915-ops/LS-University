@@ -18,6 +18,7 @@ import CertificateVerification from './pages/CertificateVerification';
 import FeePayment from './pages/FeePayment';
 import Placements from './pages/Placements';
 import Scholarships from './pages/Scholarships';
+import NotFound from './pages/NotFound';
 
 // Admin placeholders
 import AdminLogin from './pages/admin/Login';
@@ -65,11 +66,13 @@ export default function App() {
             <Route path="approvals" element={<GenericPage pageId="approvals" />} />
             <Route path="scholarships" element={<Scholarships />} />
             <Route path="verify-certificate" element={<CertificateVerification />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
           
           <Route path="/admin" element={<Outlet />}>
             <Route index element={<AdminLogin />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </Router>
