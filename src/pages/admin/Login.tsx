@@ -27,6 +27,7 @@ export default function AdminLogin() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/admin/dashboard');
     } catch (err: any) {
+      console.error('Firebase Auth Error:', err);
       setError(err.message || 'Failed to login');
     } finally {
       setLoading(false);
