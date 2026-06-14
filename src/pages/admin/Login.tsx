@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Lock } from 'lucide-react';
 
@@ -14,8 +14,7 @@ export default function AdminLogin() {
   const { user } = useAuth();
 
   if (user) {
-    navigate('/admin/dashboard');
-    return null;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
